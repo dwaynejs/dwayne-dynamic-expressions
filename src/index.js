@@ -2,18 +2,44 @@ const { hasOwnProperty } = {};
 
 export default (expressions) => {
   return (Block) => {
+    expressions = assign({}, expressions, Block.expressions);
+
     return class extends Block {
       constructor(opts) {
         super(opts);
 
-        for (const local in expressions) {
-          if (expressions::hasOwnProperty(local)) {
-            this[local] = this.evaluateAndWatch(expressions[local], (newValue) => {
-              this[local] = newValue;
-            });
-          }
-        }
+        iterate(expressions, (expression, local) => {
+          this[local] = undefined;
+        });
+      }
+
+      afterConstruct() {
+        iterate(expressions, (expression, local) => {
+          this[local] = this.evaluate(expression, (newValue) => {
+            this[local] = newValue;
+          });
+        });
+
+        super.afterConstruct();
       }
     };
   };
 };
+
+function iterate(object, cb) {
+  for (const local in object) {
+    if (object::hasOwnProperty(local)) {
+      cb(object[local], local);
+    }
+  }
+}
+
+function assign(object) {
+  for (let i = 1, length = arguments.length; i < length; i++) {
+    iterate(arguments[i], (value, key) => {
+      object[key] = value;
+    });
+  }
+
+  return object;
+}

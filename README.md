@@ -27,16 +27,19 @@ $ npm install --save dwayne-dynamic-expressions
 
 import { Block } from 'dwayne';
 import template from './index.html';
-import dynamicExpressions from 'dwayne-dynamic-expressions';
+import expressions from 'dwayne-dynamic-expressions';
 
 class MyBlock extends Block {
   static template = template;
-  
+  static expressions = {
+    b: js`c + args.b + globals.a`
+  };
+
   b = 1;
 }
 
 Block.block('MyBlock', MyBlock.wrap(
-  dynamicExpressions({
+  expressions({
     a: js`b + args.a + globals.c`
   })
 ));
@@ -44,10 +47,14 @@ Block.block('MyBlock', MyBlock.wrap(
 // or if you don't use dwayne babel preset
 
 Block.block('MyBlock', MyBlock.wrap(
-  dynamicExpressions({
+  expressions({
     a(block) {
       return block.b + block.args + block.globals.c;
     }
   })
 ));
 ```
+
+Expressions from the static property are merged with the wrapper
+argument (static property has a higher priority). You can start
+using them starting from `afterConstruct`.
