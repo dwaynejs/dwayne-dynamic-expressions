@@ -26,11 +26,11 @@ $ npm install --save dwayne-dynamic-expressions
 // MyBlock/index.js
 
 import { Block } from 'dwayne';
-import template from './index.html';
+import html from './index.html';
 import expressions from 'dwayne-dynamic-expressions';
 
 class MyBlock extends Block {
-  static template = template;
+  static html = html;
   static expressions = {
     b: js`c + args.b + globals.a`
   };
@@ -38,21 +38,21 @@ class MyBlock extends Block {
   b = 1;
 }
 
-Block.block('MyBlock', MyBlock.wrap(
+export default MyBlock.wrap(
   expressions({
     a: js`b + args.a + globals.c`
   })
-));
+);
 
 // or if you don't use dwayne babel preset
 
-Block.block('MyBlock', MyBlock.wrap(
+export default MyBlock.wrap(
   expressions({
     a(block) {
       return block.b + block.args + block.globals.c;
     }
   })
-));
+);
 ```
 
 Expressions from the static property are merged with the wrapper
